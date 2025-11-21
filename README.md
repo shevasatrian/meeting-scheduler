@@ -77,33 +77,71 @@ npm run dev
 | `minimumNotice`     | Int      | Minimal jarak waktu sebelum meeting |
 | `blackoutDates`     | Json     | Array tanggal yang dilock           |
 ### Concurrency Approach
-## 1. Atomic Transactions ($transaction)
-# Used in:
+### 1. Atomic Transactions ($transaction)
+#### Used in:
 - createBooking
 - rescheduleBooking
-# Inside each transaction:
+#### Inside each transaction:
 - Check whether the requested time slot is already taken
 - If yes → throw "Slot already booked"
 - If not → create or update the booking within the same transaction
-## 2. Stateless Slot Generator
-# Available slots are generated on each request based on:
+### 2. Stateless Slot Generator
+#### Available slots are generated on each request based on:
 - Working hours
 - Meeting duration
 - Minimum notice
 - Existing bookings
 - Blackout dates
-# Because slot generation is stateless:
+#### Because slot generation is stateless:
 - No shared mutable state
 - No race conditions
 - Always deterministic
 - Cache-friendly if needed
-## 3. Safe Rescheduling Logic
-# Rescheduling also uses:
+### 3. Safe Rescheduling Logic
+#### Rescheduling also uses:
 - Atomic transactions
 - Conflict detection
 - Self-exclusion rule (NOT: { id })
 - End time recalculation based on duration
-# This ensures:
+#### This ensures:
 - Old slot is released
 - New slot is safely reserved
 - No overlapping occurs
+
+## Test Instructions
+### 1. Run backend tests (API-level manual testing)
+#### Test all endpoints manually using postman
+#### 1. Load organizer settings
+```
+GET /settings
+```
+#### 2. Update organizer settings
+```
+PUT /settings
+```
+#### 3. Get available slots
+```
+GET /slots?start=2025-01-10T00:00:00&end=2025-01-10T23:59:59
+```
+#### 4. Create a booking
+```
+POST /bookings
+```
+#### 5. Reschedule a booking
+```
+PUT /bookings/:id/reschedule
+```
+#### 6. Delete a booking
+```
+DELETE /bookings/:id
+```
+### 2. Frontend Testing
+#### Manual UI test checklist:
+- Select a date (only up to 14 days allowed)
+- Load available slots
+- Create a booking
+- Confirm booking appears in dashboard
+- Apply date range filter
+- Reschedule booking
+- Cancel booking
+- Update organizer settings and check if slots regenerate correctly
