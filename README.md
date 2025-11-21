@@ -55,3 +55,55 @@ npm run dev
 - booking
 - organizerSettings
 ```
+
+## Data Model Outline & Concurrency Approach
+### Data Model (Prisma)
+#### booking
+| Field          | Type     | Description                |
+| -------------- | -------- | -------------------------- |
+| `id`           | Int (PK) | Auto-increment primary key |
+| `inviteeName`  | String   | Nama pengundang            |
+| `inviteeEmail` | String   | Email pengundang           |
+| `startTime`    | DateTime | Waktu mulai pertemuan      |
+| `endTime`      | DateTime | Waktu selesai pertemuan    |
+| `createdAt`    | DateTime | Timestamp otomatis         |
+#### organizerSettings
+| Field               | Type     | Description                         |
+| ------------------- | -------- | ----------------------------------- |
+| `id`                | Int (PK) | Single-row settings                 |
+| `workingHoursStart` | String   | Format `HH:mm`                      |
+| `workingHoursEnd`   | String   | Format `HH:mm`                      |
+| `meetingDuration`   | Int      | Durasi meeting dalam menit          |
+| `minimumNotice`     | Int      | Minimal jarak waktu sebelum meeting |
+| `blackoutDates`     | Json     | Array tanggal yang dilock           |
+### Concurrency Approach
+## 1. Atomic Transactions ($transaction)
+# Used in:
+- createBooking
+- rescheduleBooking
+# Inside each transaction:
+- Check whether the requested time slot is already taken
+- If yes → throw "Slot already booked"
+- If not → create or update the booking within the same transaction
+## 2. Stateless Slot Generator
+# Available slots are generated on each request based on:
+- Working hours
+- Meeting duration
+- Minimum notice
+- Existing bookings
+- Blackout dates
+# Because slot generation is stateless:
+- No shared mutable state
+- No race conditions
+- Always deterministic
+- Cache-friendly if needed
+## 3. Safe Rescheduling Logic
+# Rescheduling also uses:
+- Atomic transactions
+- Conflict detection
+- Self-exclusion rule (NOT: { id })
+- End time recalculation based on duration
+# This ensures:
+- Old slot is released
+- New slot is safely reserved
+- No overlapping occurs
