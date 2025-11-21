@@ -62,20 +62,20 @@ npm run dev
 | Field          | Type     | Description                |
 | -------------- | -------- | -------------------------- |
 | `id`           | Int (PK) | Auto-increment primary key |
-| `inviteeName`  | String   | Nama pengundang            |
-| `inviteeEmail` | String   | Email pengundang           |
-| `startTime`    | DateTime | Waktu mulai pertemuan      |
-| `endTime`      | DateTime | Waktu selesai pertemuan    |
-| `createdAt`    | DateTime | Timestamp otomatis         |
+| `inviteeName`  | String   | Name of the invitee        |
+| `inviteeEmail` | String   | Email of the invitee       |
+| `startTime`    | DateTime | Meeting start time         |
+| `endTime`      | DateTime | Meeting end time           |
+| `createdAt`    | DateTime | Auto-generated timestamp   |
 #### organizerSettings
-| Field               | Type     | Description                         |
-| ------------------- | -------- | ----------------------------------- |
-| `id`                | Int (PK) | Single-row settings                 |
-| `workingHoursStart` | String   | Format `HH:mm`                      |
-| `workingHoursEnd`   | String   | Format `HH:mm`                      |
-| `meetingDuration`   | Int      | Durasi meeting dalam menit          |
-| `minimumNotice`     | Int      | Minimal jarak waktu sebelum meeting |
-| `blackoutDates`     | Json     | Array tanggal yang dilock           |
+| Field               | Type     | Description                                    |
+| ------------------- | -------- | ---------------------------------------------- |
+| `id`                | Int (PK) | Single-row settings                            |
+| `workingHoursStart` | String   | Time format `HH:mm`                            |
+| `workingHoursEnd`   | String   | Time format `HH:mm`                            |
+| `meetingDuration`   | Int      | Meeting duration in minutes                    |
+| `minimumNotice`     | Int      | Minimum time notice before a meeting (minutes) |
+| `blackoutDates`     | Json     | Array of blocked dates                         |
 ### Concurrency Approach
 ### 1. Atomic Transactions ($transaction)
 #### Used in:
